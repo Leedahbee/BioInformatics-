@@ -1,0 +1,93 @@
+---
+title: "RNA Seq FINAL"
+author: "Natalie Dovale"
+format: html
+editor: visual
+execute:
+  keep-md: true
+---
+
+## Using edgeR RNA Seq
+
+```{r}
+#install.packages("devtools")
+library(devtools)
+```
+
+Installing package devtools and adding it to the library for future accessibility.
+
+```{r}
+#devtools::install_github("danmaclean/rbioinfcookbook")
+library(rbioinfcookbook)
+```
+
+Using devtools to install rbioinfcookbook from github by accessing it through the author danmaclean. Adding rbioinfcookbook to library for future accessibility.
+
+```{r}
+#install.packages("forcats")
+
+#if (!require("BiocManager", quietly = TRUE))
+  #install.packages("BiocManager")
+
+#BiocManager::install("edgeR")
+
+#if (!require("BiocManager", quietly = TRUE))
+    #install.packages("BiocManager")
+
+#BiocManager::install("Biobase")
+
+library(forcats)
+library(edgeR)
+```
+
+Installing package forcats, check that BiocManager is installed if it is not then BiocManager will be downloaded without needing confirmation. Use BiocManager to install edgeR, once again checking for the packages BiocManager. Use BiocManager to install Biobase. Added forcats and edgeR to the library for future accessibility.
+
+```{r}
+library(Biobase)
+```
+
+Add Biobase to the library for future accessibility.
+
+```{r}
+genes <- count_dataframe[['gene']]
+count_dataframe[['gene']] <- NULL
+count_matrix <- as.matrix(count_dataframe)
+rownames(count_matrix) <- genes
+```
+
+Loading a count table with RNA transcripts and their frequency and converted it into a matrix/data table that is readable by R. The RNA transcripts counts come from the *Drosophila* fly experiment.
+
+```{r}
+experiments_of_interest <- c("L1Larvae", "L2Larvae")
+columns_of_interest <- which(pheno_data[['stage']] %in% experiments_of_interest)
+```
+
+Pulling another data set from rbioinfcookbook- pheno_data. Showing phenotypic data and physical notation about larvae and the larval stages L1-first instar, and L2-second instar.
+
+```{r}
+grouping <- pheno_data[["stage"]] [columns_of_interest] |> forcats::as_factor()
+```
+
+Setting up grouping factors.
+
+```{r}
+counts_of_interest <- count_matrix[,counts = columns_of_interest]
+```
+
+Creating subset of the count_matrix table pulling out columns of interest, counts_of_interest.
+
+```{r}
+count_dge <- edgeR::DGEList(counts = counts_of_interest, group = grouping)
+```
+
+Using edgeR's DGEList function to assemble all of the data into one object given the name count_dge, resulting in a combined file containing the transcript counts and the larval stage information
+
+```{r}
+design <- model.matrix(~grouping)
+eset_dge <- edgeR::estimateDisp(count_dge, design)
+fit <- edgeR::glmQLFit(eset_dge, design)
+result <- edgeR::glmQLFTest(fit, coef=2)
+topTags(result)
+```
+
+Use model.matrix to tell edgeR the experimental design and the variables we are testing for. Next estimateDisp is used to estimate the spread of the count data. Applying glmQLFit so our data fits a generalized linear model. The glmQLFTest line performs a likelihood ratio test to identify genes that are differentially expressed. This helps to identify which genes are significantly different from others in the sample. Finally topTags displays the differentially expressed genes.
