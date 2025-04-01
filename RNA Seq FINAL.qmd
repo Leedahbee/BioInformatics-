@@ -90,4 +90,6 @@ result <- edgeR::glmQLFTest(fit, coef=2)
 topTags(result)
 ```
 
-Use model.matrix to tell edgeR the experimental design and the variables we are testing for. Next estimateDisp is used to estimate the spread of the count data. Applying glmQLFit so our data fits a generalized linear model. The glmQLFTest line performs a likelihood ratio test to identify genes that are differentially expressed. This helps to identify which genes are significantly different from others in the sample. Finally topTags displays the differentially expressed genes.
+Use model.matrix to tell edgeR the experimental design and the variables we are testing for. Next, estimateDisp is used to estimate the spread of the count data. Applying glmQLFit so our data fits a generalized linear model. The glmQLFTest line performs a likelihood ratio test to identify differentially expressed genes. This helps identify which genes significantly differ from others in the sample. Finally, topTags displays the differentially expressed genes.
+
+FBgn0027527- Essentially codes for epidermis factors on the back, sides, and head during the embryonic phase.
