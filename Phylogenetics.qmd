@@ -1,0 +1,178 @@
+---
+title: "Phylogenetics"
+author: "Natalie Dovale"
+format: html
+editor: visual
+execute:
+  keep-md: true
+---
+
+## Phylogenetic Analysis and Visualization
+
+## Installing packages and adding to the library
+
+```{r}
+#install.packages("ape")
+
+#if (!require("BiocManager", quietly = TRUE))
+    #install.packages("BiocManager")
+
+#BiocManager::install("treeio")
+
+#if (!require("BiocManager", quietly = TRUE))
+    #install.packages("BiocManager")
+
+#BiocManager::install("ggtree")
+
+#if (!require("BiocManager", quietly = TRUE))
+    #install.packages("BiocManager")
+
+#BiocManager::install("SGSeq")
+```
+
+Installing required packages.
+
+```{r}
+library(rbioinfcookbook)
+library(SGSeq)
+library(ape)
+library(treeio)
+library(ggplot2)
+library(ggtree)
+```
+
+Adding necessary packages to the library for ease of future access.
+
+## Reading and writing trees with ape and treeio
+
+```{r}
+newick_file_path <- fs::path_package("extdata", "mammal_tree.nwk", package = "rbioinfcookbook" )
+
+nexus_file_path <- fs::path_package("extdata", "mammal_tree.nexus", package = "rbioinfcookbook")
+
+newick <- ape::read.tree(newick_file_path)
+nexus <- ape::read.nexus(nexus_file_path)
+```
+
+Creates a file path for the required packages such that a Newick and a Nexus format evolutionary tree can be created to be interpreted and manipulated by further coding to eventually create an easy to visualise tree.
+
+```{r}
+beast_file_path <- fs::path_package("extdata", "beast_mcc.tree", package = "rbioinfcookbook")
+
+raxml_file_path <- fs::path_package("extdata", "RAxML_bipartitionsBranchLabels.H3", package = "rbioinfcookbook")
+
+beast <- read.beast(beast_file_path)
+raxml <- read.raxml(raxml_file_path)
+```
+
+Created and loaded into the environment a BEAST and RAxML format tree to be modified later by treeio
+
+```{r}
+class(newick)
+```
+
+```{r}
+class(nexus)
+```
+
+```{r}
+class(beast)
+```
+
+```{r}
+class(raxml)
+```
+
+Used the class function to check what type of objects each tree type is, this will be used later to apply to appropriate analysis function. There are two formats, phylo and treedata, treeio functions will be used to interconvert between the different formats.
+
+```{r}
+beast_phylo <- treeio::as.phylo(beast)
+newick_tidytree <- treeio::as.treedata(newick)
+```
+
+```{r}
+treeio::write.beast(newick_tidytree, file = "mammal_tree.beast")
+ape::write.nexus(beast_phylo, file = "beast_mcc.nexus")
+```
+
+Formats the trees such that they can be read by several phylogenetic analysis packages. Using the free resources on the Interactive Tree of Life Project website the mammal_tree.beat file was uploaded. Displayed was a simple tree which displayed the relationship between some mammals. The tree demonstrates a closer relationship between species of monkeys and humans compared to bovines and rodents.
+
+## Visualizing trees using ggtree
+
+### An overview of functions
+
+```{r}
+tree_file <- fs::path_package("extdata", "itol.nwk", package = "rbioinfcookbook")
+
+itol<- ape::read.tree(tree_file)
+```
+
+Loaded in trees from the rbioinfcookbook package.
+
+```{r}
+ggtree(itol)
+```
+
+Used ggtree to create a basic tree plot.
+
+```{r}
+ggtree(itol) +
+  geom_tiplab(color = "blue", size = 1)
+```
+
+Added labels to identify which branch pertains to what.
+
+```{r}
+ggtree(itol, layout = "circular") +
+  geom_tiplab(color = "blue", size = 2)
+```
+
+Created a circular plot in an attempt to make the information contained therein more intelligible.
+
+```{r}
+ggtree(itol, layout = "circular") +
+  geom_tiplab(color = "blue", size = 2) +
+  geom_strip(13, 14, color = "red", barsize = 1)
+```
+
+Added in an annotation containing a strip of color that highlights a particular clade.
+
+```{r}
+ggtree(itol) +
+  coord_flip() +
+  scale_x_reverse()
+```
+
+Experimented with inverting the tree.
+
+```{r}
+ggtree(itol, layout = "unrooted")
+```
+
+Displays the tree as unrooted in order to display relationships between organisms while divorcing the aspect of time present in the prior tree formats this type of tree is particularly useful when the origin of the species is unclear.
+
+### Mammal Phylogeny
+
+```{r}
+mammal_file <- fs::path_package("extdata", "mammal_tree.nwk", package = "rbioinfcookbook" )
+
+mammal<- ape::read.tree(mammal_file)
+```
+
+Loaded in the mammal Newick file and used ape to read the tree.
+
+```{r}
+ggtree(mammal) +
+  geom_tiplab(color = "blue", size = 2)
+```
+
+Used ggtree to create a basic tree plot with labels
+
+```{r}
+ggtree(mammal, layout = "circular") +
+  geom_tiplab(color = "blue", size = 2)
+```
+
+Changed the displayed layout type to circular to compare to the prior layout and gauge the difference in how digestible the information is.
+
+This has been a basic learning exercise in the creation and manipulation of phylogenetic trees.
